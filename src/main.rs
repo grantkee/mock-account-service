@@ -42,12 +42,19 @@ impl Options {
         Ok(pool)
     }
 
-    pub async fn rocket(&self) -> Result<Rocket<Build>> {
+    pub async fn build_rocket(&self) -> Result<Rocket<Build>> {
+        // build REST api using routes from api mod
         let rocket = rocket::build()
             .mount("api/v1", api::routes())
             .manage(self.clone());
-        
         Ok(rocket)
+    }
+
+    pub async fn run(&self) -> Result<()> {
+        // launch rocket
+        let rocket = self.build_rocket().await?;
+        rocket.launch().await?;
+        Ok(())
     }
 }
 
