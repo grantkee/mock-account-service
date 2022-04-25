@@ -1,0 +1,7 @@
+CREATE TABLE account(
+    id UUID NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    username TEXT NOT NULL,
+    UNIQUE(id)
+)
