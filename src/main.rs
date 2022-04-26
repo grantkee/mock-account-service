@@ -4,8 +4,8 @@ use sqlx::AnyPool;
 use std::net::Ipv4Addr;
 use structopt::StructOpt;
 
-mod api;
 mod account;
+mod api;
 
 #[derive(StructOpt, Clone, Debug)]
 enum Command {
@@ -18,6 +18,7 @@ enum Command {
     name = "account service",
     about = "An example account service for a microservices backend."
 )]
+
 struct Options {
     /// Database to use.
     #[structopt(long, short, env = "DATABASE", default_value = "sqlite://:memory:")]

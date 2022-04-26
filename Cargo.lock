@@ -847,6 +847,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "env_logger",
+ "log",
  "rocket",
  "serde",
  "serde_json",

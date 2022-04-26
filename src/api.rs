@@ -1,3 +1,4 @@
+use crate::account;
 use crate::account::{Account, AccountError};
 use rocket::serde::{json::Json, uuid::Uuid};
 use rocket::*;
@@ -6,7 +7,7 @@ use rocket::*;
 async fn account_create(data: Json<Account>) -> Result<Json<Account>, AccountError> {
     match account::create(&data).await {
         Ok(data) => Ok(Json(data)),
-        Err(e) => Err(e)
+        Err(e) => Err(e),
     }
 }
 
