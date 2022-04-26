@@ -1,13 +1,23 @@
-use structopt::StructOpt;
-use std::net::Ipv4Addr;
-use sqlx::AnyPool;
 use anyhow::Result;
 use rocket::{tokio, Build, Rocket};
+use sqlx::AnyPool;
+use std::net::Ipv4Addr;
+use structopt::StructOpt;
 
 mod api;
+mod account;
 
 #[derive(StructOpt, Clone, Debug)]
-#[structopt(name = "account service", about = "An example account service for a microservices backend.")]
+enum Command {
+    Run(Options),
+    Migrate { database: String },
+}
+
+#[derive(StructOpt, Clone, Debug)]
+#[structopt(
+    name = "account service",
+    about = "An example account service for a microservices backend."
+)]
 struct Options {
     /// Database to use.
     #[structopt(long, short, env = "DATABASE", default_value = "sqlite://:memory:")]
@@ -18,19 +28,6 @@ struct Options {
     /// Port to use.
     #[structopt(long, short, env = "PORT", default_value = "3000")]
     port: u16,
-}
-
-pub struct Account {
-    id: Uuid,
-    username: String,
-}
-
-#[derive(Error, Debug)]
-pub enum AccountError {
-    #[error("Account already exists.")]
-    AccountExists,
-    #[error("Unknown error has occurred.")]
-    UnknownError,
 }
 
 impl Options {
@@ -58,8 +55,20 @@ impl Options {
     }
 }
 
-#[tokio::main]
-async fn main() {
-    let options = Options::from_args();
-    println!("Hello, world!");
+#[rocket::main]
+async fn main() -> Result<()> {
+    env_logger::init();
+    let command = Command::from_args();
+
+    match command {
+        Command::Run(options) => {
+            options.run().await?;
+            Ok(())
+        }
+        Command::Migrate { database } => {
+            let pool = AnyPool::connect(&database).await?;
+            sqlx::migrate!().run(&pool).await?;
+            Ok(())
+        }
+    }
 }
